@@ -9,6 +9,7 @@ out_dic_path = 'Data/output_and_input/'
 train_file_name = 'train_file'
 validation_file_name = 'validation_file'
 test_file_name = 'test_file'
+validation_small_file_name = 'validation_small_file'
 word2vec_file_path = 'Data/word_vec/word2vec.vec'
 pattern_vec_out_path = 'Data/word_vec/pattern_out'
 variable_symbol = '<*>'
@@ -26,7 +27,7 @@ model_output_directory = root_path + 'model_out/'
 data_file = 'Data/output_and_input/train_file'
 patter_vec_file = 'Data/word_vec/pattern_out'
 
-test_file_path = out_dic_path + validation_file_name
+test_file_path = out_dic_path + validation_small_file_name
 
 
 def lifelong_preprocess():

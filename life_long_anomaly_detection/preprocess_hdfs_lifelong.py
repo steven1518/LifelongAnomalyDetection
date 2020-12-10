@@ -49,7 +49,6 @@ def generate_train_test_validation_template2vec_file(logparser_structed_file, lo
                                                      train_out_file_name, validation_out_file_name, test_out_file_name,
                                                      wordvec_path,
                                                      pattern_vec_out_path, variable_symbol):
-    # TODO to check if the file if right
     add_numberid(logparser_event_file)
     anomaly_block_set = get_anomaly_block_id_set(anomaly_label_file)
     log_template_dic = get_log_template_dic(logparser_event_file)

@@ -12,33 +12,6 @@ import pandas as pd
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-def generate_seq_label(file_path, window_length, pattern_vec_file):
-    vec_to_class_type = {}
-    with open(pattern_vec_file, 'r') as pattern_file:
-        i = 0
-        for line in pattern_file.readlines():
-            pattern, vec = line.split('[:]')
-            pattern_vector = tuple(map(float, vec.strip().split(' ')))
-            vec_to_class_type[pattern_vector] = i
-            i = i + 1
-    num_of_sessions = 0
-    input_data, output_data = [], []
-    with open(file_path, 'r') as file:
-        for line in file.readlines():
-            num_of_sessions += 1
-            line = tuple(
-                map(lambda n: tuple(map(float, n.strip().split())), [x for x in line.strip().split(',') if len(x) > 0]))
-            if len(line) < window_length:
-                # print(line)
-                continue
-            for i in range(len(line) - window_length):
-                input_data.append(line[i:i + window_length])
-                # line[i] is a list need to read file form a dic{vec:log_key} to get log key
-                output_data.append(vec_to_class_type[line[i + window_length]])
-    data_set = TensorDataset(torch.tensor(input_data, dtype=torch.float), torch.tensor(output_data))
-    return data_set
-
-
 # 构建dataset 具体的思路如下
 # 根据每一个block id的所有的的number id序列，来构造基于窗口的dataset
 def generate_session_seq_dataset(file_path, window_length, pattern_vec_file):
@@ -48,13 +21,14 @@ def generate_session_seq_dataset(file_path, window_length, pattern_vec_file):
     train_file = pd.read_csv(file_path)
     for _, row in train_file.iterrows():
         session_list = [int(number_id) for number_id in row['Sequence'].strip().split()]
-        # TODO : to consider if make it longer like the operation of robust
         if len(session_list) < window_length + 1:
-            continue
+            seq = [[-1]*300 for x in range(window_length+1-len(session_list))]
+            seq.extend([numberId_to_vec[str(x)] for x in session_list[:-1]])
+            input_data.append(seq)
+            output_data.append(int(session_list[-1]))
         else:
             for i in range(len(session_list) - window_length):
                 input_data.append([numberId_to_vec[str(x)] for x in session_list[i:i + window_length]])
-                # TODO : Question: why use the integer not use the vector
                 output_data.append(int(session_list[i + window_length]))
     data_set = TensorDataset(torch.tensor(input_data, dtype=torch.float),
                              torch.tensor(output_data))
@@ -73,10 +47,8 @@ def train_model(window_length, input_size, hidden_size, num_of_layers, num_of_cl
     # create data set
     sequence_data_set = generate_session_seq_dataset(data_file, window_length, pattern_vec_file)
     # create data_loader
-    print('test', len(sequence_data_set))
+
     data_loader = DataLoader(dataset=sequence_data_set, batch_size=batch_size, shuffle=True, pin_memory=False)
-    print('major', len(data_loader))
-    print(len(sequence_data_set) % batch_size)
     writer = SummaryWriter(logdir=log_directory + log_template)
 
     # Loss and optimizer  classify job
@@ -107,7 +79,6 @@ def train_model(window_length, input_size, hidden_size, num_of_layers, num_of_cl
             e_log = 'Adam_batch_size=' + str(batch_size) + ';epoch=' + str(epoch + 1)
             torch.save(model.state_dict(), model_output_directory + '/' + e_log + '.pt')
         # TODO : validation
-
 
     writer.close()
     print('Training finished')
