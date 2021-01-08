@@ -21,12 +21,12 @@ hidden_size = 128
 num_of_layers = 2
 num_of_classes = 48
 num_of_epochs = 50
-batch_size = 24576+2048
+batch_size = 4096*2*2+5120+1024+1024
 root_path = 'Data/'
 model_output_directory = root_path + 'model_out/'
 data_file = 'Data/output_and_input/train_file'
 patter_vec_file = 'Data/word_vec/pattern_out'
-
+expert_file = 'Data/expert/detection_file'
 test_file_path = out_dic_path + validation_small_file_name
 
 
@@ -71,7 +71,8 @@ def lifelong_predict():
         model_output_directory + 'Adam_batch_size=' + str(batch_size) + ';epoch=' + str(num_of_epochs) + '.pt',
         test_file_path,
         patter_vec_file,
-        10
+        10,
+        expert_file
     )
 
 

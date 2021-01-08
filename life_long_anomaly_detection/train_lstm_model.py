@@ -1,5 +1,5 @@
 import json
-
+import sys
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -107,3 +107,34 @@ class Model(nn.Module):
         # print('out[:, -1, :]:')
         # print(out)
         return out
+
+window_length = 5
+input_size = 300
+hidden_size = 128
+num_of_layers = 2
+num_of_classes = 48
+num_of_epochs = 50
+batch_size = 4096*2*2+5120+1024+1024
+root_path = 'Data/'
+model_output_directory = root_path + 'model_out/'
+data_file = 'Data/output_and_input/train_file'
+patter_vec_file = 'Data/word_vec/pattern_out'
+
+if __name__ == '__main__':
+    # python train_lstm_model.py D:/anomaly_detection/  D:/anomaly_detection/Data/output_and_input/train_file
+    params = sys.argv[1:]
+    if not os.path.exists(params[0] + model_output_directory):
+        os.makedirs(params[0] + model_output_directory)
+    train_model(
+        window_length,
+        input_size,
+        hidden_size,
+        num_of_layers,
+        num_of_classes,
+        num_of_epochs,
+        batch_size,
+        params[0] + root_path,
+        params[0] + model_output_directory,
+        params[1],
+        params[0] + patter_vec_file
+    )

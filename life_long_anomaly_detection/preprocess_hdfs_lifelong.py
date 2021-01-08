@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+import sys
 import os
 import io
 import re
@@ -10,6 +11,18 @@ import numpy as np
 
 block_id_regex = r'blk_(|-)[0-9]+'
 special_patterns = {'dfs.FSNamesystem:': ['dfs', 'FS', 'Name', 'system'], 'dfs.FSDataset:': ['dfs', 'FS', 'dataset']}
+
+log_structured_file_path = 'Data/log/HDFS.log_structured.csv'
+log_template_file_path = 'Data/log/HDFS.log_templates.csv'
+anomaly_label_file_path = 'Data/log/anomaly_label.csv'
+out_dic_path = 'Data/output_and_input/'
+train_file_name = 'train_file'
+validation_file_name = 'validation_file'
+test_file_name = 'test_file'
+validation_small_file_name = 'validation_small_file'
+word2vec_file_path = 'Data/word_vec/word2vec.vec'
+pattern_vec_out_path = 'Data/word_vec/pattern_out'
+variable_symbol = '<*>'
 
 
 # 给template文件添加numberID 作为分别的标识数据
@@ -191,3 +204,27 @@ def pattern_to_vec(logparser_event_file, wordvec_path, pattern_vec_out_path, var
     with open(pattern_vec_out_path, 'w+') as file_obj:
         file_obj.write(json_str)
     return pattern_to_vectors
+
+
+if __name__ == '__main__':
+    params = ['D:/anomaly_detection/','D:/anomaly_detection/Data/log/HDFS.log_structured.csv']
+    params = sys.argv[1:]
+    if not os.path.exists(params[0] + log_template_file_path):
+        os.makedirs(params[0] + log_template_file_path)
+    if not os.path.exists(params[0] + anomaly_label_file_path):
+        os.makedirs(params[0] + anomaly_label_file_path)
+    if not os.path.exists(params[0] + out_dic_path):
+        os.makedirs(params[0] + out_dic_path)
+    print(params[0] + log_template_file_path)
+    generate_train_test_validation_template2vec_file(
+        params[1],
+        params[0] + log_template_file_path,
+        params[0] + anomaly_label_file_path,
+        params[0] + out_dic_path,
+        train_file_name,
+        validation_file_name,
+        test_file_name,
+        params[0] + word2vec_file_path,
+        params[0] + pattern_vec_out_path,
+        variable_symbol
+    )
