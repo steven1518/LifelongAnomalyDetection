@@ -40,11 +40,15 @@ def do_predict_new(input_size, hidden_size, num_layers, num_classes, window_leng
     FP = 0
     TN = 0
     FN = 0
+    cn=0
     with torch.no_grad():
         print('predict start')
         # choose one line to detect
         detection_data['prediction'] = 0
         for _, row in detection_data.iterrows():
+            cn+=1
+            print("times:"+str(cn))
+            print('FP: {}, FN: {}, TP: {}, TN: {}'.format(FP, FN, TP, TN))
             id_list = [int(x) for x in row['Sequence'].strip().split()]
             sequence_length = len(id_list)
             if sequence_length < window_length + 1:
@@ -57,13 +61,13 @@ def do_predict_new(input_size, hidden_size, num_layers, num_classes, window_leng
                 if id_list[-1] not in predicted:
                     row['prediction'] = 1
                     detection_data.loc[_,'prediction'] = 1
-                    print(row)
+                    # print(row)
                     if int(row['label']) == 0:
                         FP += 1
                     else:
                         TP += 1
                 else:
-                    print(row)
+                    # print(row)
                     if int(row['label']) == 0:
                         TN += 1
                     else:
@@ -85,13 +89,13 @@ def do_predict_new(input_size, hidden_size, num_layers, num_classes, window_leng
                     row['prediction'] = 1
                     detection_data.loc[_,'prediction'] = 1
 
-                    print(row)
+                    # print(row)
                     if int(row['label']) == 1:
                         TP += 1
                     else:
                         FP += 1
                 else:
-                    print(row)
+                    # print(row)
                     if int(row['label'] == 0):
                         TN += 1
                     else:

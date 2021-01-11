@@ -13,11 +13,11 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 # 构建dataset 具体的思路如下
-# 根据每一个block id的所有的的number id序列，来构造基于窗口的dataset
+# 根据每一个block id的所有的的number_id序列，来构造基于窗口的dataset
 def generate_session_seq_dataset(file_path, window_length, pattern_vec_file):
     with open(pattern_vec_file, 'r') as pattern_file:
         numberId_to_vec = json.load(pattern_file)
-    input_data, output_data = [], []
+    input_data, output_data = [],[]
     train_file = pd.read_csv(file_path)
     for _, row in train_file.iterrows():
         session_list = [int(number_id) for number_id in row['Sequence'].strip().split()]
