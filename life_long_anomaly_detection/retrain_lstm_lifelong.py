@@ -1,6 +1,8 @@
 # -*- coding: UTF-8 -*-
 
 import json
+import sys
+
 import torch
 import pandas as pd
 import time
@@ -14,7 +16,7 @@ from life_long_anomaly_detection.train_lstm_model import Model
 # use cuda if available otherwise use cpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
-BND = 0.8
+BND = 1.4
 lamda = 1
 
 
@@ -195,3 +197,54 @@ def retrain_lifelong(window_length, input_size, hidden_size, num_of_layers, num_
 
     writer.close()
     print('Retraining finished')
+
+
+log_structured_file_path = 'Data/ log/HDFS.log_structured.csv'
+log_template_file_path = 'Data/ log/HDFS.log_templates.csv'
+anomaly_label_file_path = 'Data/ log/anomaly_label.csv'
+out_dic_path = 'Data/output_and_input/'
+train_file_name = 'train_file'
+validation_file_name = 'validation_file'
+test_file_name = 'test_file'
+validation_small_file_name = 'validation_small_file'
+word2vec_file_path = 'Data/word_vec/word2vec.vec'
+pattern_vec_out_path = 'Data/word_vec/pattern_out'
+variable_symbol = '<*>'
+retrain_model_output = 'Data/retrain_model_out/'
+retrain_model_input_file = 'Data/retrain_model_input/detection_file'
+# param
+window_length = 5
+input_size = 300
+hidden_size = 128
+num_of_layers = 2
+num_of_classes = 48
+num_of_epochs = 50
+batch_size = 512
+root_path = 'Data/'
+model_output_directory = root_path + 'model_out/'
+data_file = 'Data/output_and_input/train_file'
+patter_vec_file = 'Data/word_vec/pattern_out'
+expert_file = 'Data/expert/detection_file'
+test_file_path = out_dic_path + validation_small_file_name
+
+if __name__ == '__main__':
+    # python predict_lstm_model.py D:/anomaly_detection/ D:/anomaly_detection/Data/output_and_input/train_file
+    params = sys.argv[1:]
+    params = ['D:/anomaly_detection/','D:/anomaly_detection/Data/output_and_input/validation_small_file']
+    if not os.path.exists(params[0] + 'Data/expert'):
+        os.makedirs(params[0] + 'Data/expert')
+    retrain_lifelong(
+        window_length,
+        input_size,
+        hidden_size,
+        num_of_layers,
+        num_of_classes,
+        model_output_directory + 'Adam_batch_size=' + str(batch_size) + ';epoch=' + str(num_of_epochs) + '.pt',
+        # model_output_directory
+        num_of_epochs,
+        batch_size,
+        root_path,
+        retrain_model_output,
+        retrain_model_input_file,
+        patter_vec_file
+    )

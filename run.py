@@ -98,5 +98,5 @@ def lifelong_predict():
 # run run run
 # lifelong_preprocess()
 # lifelong_train()
-# lifelong_predict()
-lifelong_retrain()
+lifelong_predict()
+# lifelong_retrain()
